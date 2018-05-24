@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+	*{margin:0;padding:0;}
+	a{text-decoration: none;}
+	kbd{
+		border: 1px solid red;
+		display: inline-block;
+		width: 4em;
+		height: 4em;
+		text-transform: uppercase;
+		position: relative;
+
+	}
+	body{
+		background:#ddd url(img/wall.jpg)  no-repeat center;
+		background-size:cover;
+	}
+	main{
+		text-align: center;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 100vh;
+		margin-left: 34px;
+	}
+	kbd > button{
+		position: absolute;
+		right: 4px;
+		bottom: 4px;
+		display: none;
+		border:none;
+		background: rgba(0,0,0,0);
+		color: #fff;
+		font-size: 10px;
+	}
+	kbd:hover > button{
+		display: inline-block;
+
+	}
+	.bgNav{
+		padding: 30px 30px;
+		background: rgba(255,255,255,0.2);
+		border-radius: 10px;
+	}
+	#aMain{
+		display: inline-block;
+	}
+/* 	 #aMain div:nth-child(2){
+		margin-left: -10px;
+	}
+	#aMain div:nth-child(3){
+		margin-left: -60px;
+	}  */
+
+	.keyss{
+		width: 51px;
+		height: 47px;
+		background: linear-gradient(to bottom, #292929 0%,#111111 100%);
+		border: 1px solid #373737;
+		color: #c5c5c5;
+		border-radius: 8px;
+		box-shadow: 0 0 0 1px #1A1B1C,0 0 0 1px #1f2020,0 2px 0 #000,3px 3px 2px rgba(0, 0, 0, 0.5);
+		margin: 0 12px 12px 0;
+		position: relative;
+		font-size: 18px;
+		font-family: Helvetica;
+
+	}
+	.keyss img{
+		width:16px;
+		height: 16px;
+		opacity:0.5;
+		position: absolute;
+		left: 4px;
+		bottom: 4px;
+	}
+	.keyss .text{
+		position: absolute;
+		left:5px;
+		top:3px;
+	}
+</style>
+</head>
+<body>
+	<header ></header>
+	<main>
+		<div class="bgNav">
+			<div class="nav" id="aMain"></div>
+		</div>
+	</main>
+	<footer></footer>
+	<script>
+		//1.初始化数据
+   		var aHash = init()
+   		var arr = aHash['arr']
+   		var hash = aHash['hash']
+
+   		
+    	//2.生成键盘
+    	generateKeyUser(arr,hash)
+		
+
+		//3.监听键盘
+		listenKeyborad(hash)
+
+		
+
+		//工具函数
+		function init(){
+   			var arr = [
+				['q','w','e','r','t','y','u','i','o','p'],
+				['a','s','d','f','g','h','j','k','l'],
+				['z','x','c','v','b','n','m']
+			]
+
+			var hash = {
+				q:'qq.com',
+				b:'bilibili.com'
+			}
+
+			var hashInLocalStorage = getFromLocalStorage('zzz')
+			 if(hashInLocalStorage){
+	       		 hash = hashInLocalStorage
+	   		}
+
+	   		return{
+	   			"arr":arr,
+	   			"hash":hash
+	   		}
+   		}
+
+   		function generateKeyUser(arr,hash){
+   			for(var i = 0,len=arr.length;i < len; i++){
+			var aDiv = tag('div',{className:'row'});
+
+			aMain.appendChild (aDiv);
+
+			var row = arr[i];
+			for(var j = 0;j < row.length;j++){
+				var aSpan = createSpan(row[j]);
+
+				var aButton = createButton(row[j]);
+				
+				var aImg = createImg(hash[row[j]]);
+				
+				var aKbd = tag('kbd',{className:'keyss'});
+
+				aKbd.appendChild(aSpan);
+				aKbd.appendChild(aImg);
+				aKbd.appendChild(aButton);
+
+				aDiv.appendChild(aKbd);
+				}
+			}
+   		}
+
+   		function listenKeyborad(hash){
+			document.onkeypress = function(ev){
+			var arr = ev['key'];
+			var website = hash[arr];
+			window.open('http://'+website, '_blank');
+			}
+		}
+
+		function getFromLocalStorage(name){
+    		return	JSON.parse(localStorage.getItem(name)|| 'null');
+    	}
+
+    	function tag(tagName,attributes){
+	    	var element = document.createElement(tagName);
+	    	for(var key in attributes){
+	    		element[key] = attributes[key]
+	    	}
+	    	return element
+	    }
+
+	    function createSpan(textContent){
+    		var aSpan = tag('span',{className:'text'});
+				aSpan.textContent = textContent;
+				return aSpan
+    	}
+
+    	function createButton(id){
+    		var aButton = tag('button');
+				aButton.textContent = '编辑';
+				aButton.id = id;
+				aButton.onclick = function(ev){
+					var buttonX = ev['target'];
+					var imgX = buttonX.previousSibling;
+					var key = buttonX['id'];
+					var cmp = prompt('输入一个网址');
+					hash[key] = cmp;
+					imgX.src = 'http://'+cmp+'/favicon.ico';
+					imgX.onerror = function(er){
+						er.target.src = 'img/no-icon.png';
+					}
+					localStorage.setItem('zzz',JSON.stringify(hash));
+				}
+				return aButton 
+    	}
+
+    	function createImg(domain){
+    		var aImg = tag('img')
+				if(domain){
+					aImg.src = 'http://'+domain+'/favicon.ico';
+				}else{
+					aImg.src = 'img/no-icon.png';
+				}
+				aImg.onerror = function(er){
+					er.target.src = 'img/no-icon.png';
+				}
+				return aImg;
+
+    	}
+	</script>
+</body>
+</html>
